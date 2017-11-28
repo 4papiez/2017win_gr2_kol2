@@ -19,12 +19,12 @@ from optparse import OptionParser
 import json
 
 option_help = '''choose OPTION: 
-				create_course (required course_name)/
-				create_student (required coursename fname, lname)/
-				add_grade (required course_name , fname, lname, grade)/
-				add_presence (required course_name , fname, lname, presence (T/F))/
-				get_average (required course_name, optional fname, lname)/
-				get_presence (required course_name, fname, lname)'''
+			create_course (required course_name)/
+			create_student (required coursename fname, lname)/
+			add_grade (required course_name , fname, lname, grade)/
+			add_presence (required course_name , fname, lname, presence (T/F))/
+			get_average (required course_name, optional fname, lname)/
+			get_presence (required course_name, fname, lname)'''
 
 def create_course(course_list, course_name):
 	course_list[course_name] = {}
@@ -45,11 +45,17 @@ def get_average(course_list, course, student = None):
 			result += reduce(lambda x, y: x + y, s[1]['Grades']) / len(s[1]['Grades'])
 		result /= len(course_list[course])
 	else:
-		result = reduce(lambda x, y: x + y, course_list[course][student]['Grades']) / len(course_list[course][student]['Grades'])
+		result = reduce(
+			lambda x, y: x + y, course_list[course][student]['Grades']
+			) / len(course_list[course][student]['Grades']
+		)
 	return result
 	
 def get_presence(course_list, course, student):
-	return '{:0.0f}%'.format(100 * len([x for x in course_list[course][student]['Presence'] if x]) / len(course_list[course][student]['Presence']))
+	return '{:0.0f}%'.format(
+		100 * len([x for x in course_list[course][student]['Presence'] if x]) 
+		/ len(course_list[course][student]['Presence'])
+	)
 	
 def save(course_list):
 	with open('data.json', 'w') as outfile:
@@ -77,15 +83,32 @@ if __name__ == "__main__":
 	if options.option=='create_course':
 		create_course(course_list, options.coursename)
 	elif options.option=='create_student':
-		create_student(course_list, options.coursename, options.firstname, options.lastname)
+		create_student(
+			course_list, options.coursename, 
+			options.firstname, options.lastname
+		)
 	elif options.option=='add_grade':
-		add_grade(course_list, options.coursename, options.firstname+' '+options.lastname, float(options.grade))
+		add_grade(
+			course_list, options.coursename, 
+			options.firstname+' '+options.lastname,
+			float(options.grade)
+		)
 	elif options.option=='add_presence':
-		add_presence(course_list, options.coursename,options.firstname+' '+options.lastname, True if options.presence=='T' else False)
+		add_presence(
+			course_list, options.coursename,
+			options.firstname+' '+options.lastname, 
+			True if options.presence=='T' else False
+		)
 	elif options.option=='get_presence':
-		print get_presence(course_list, options.coursename, options.firstname+' '+options.lastname) 
+		print get_presence(
+			course_list, options.coursename, 
+			options.firstname+' '+options.lastname
+		) 
 	elif options.option=='get_average':
-		print get_average(course_list, options.coursename, options.firstname+' '+options.lastname if options.firstname is not None else None)
+		print get_average(
+			course_list, options.coursename, 
+			options.firstname+' '+options.lastname if options.firstname is not None else None
+		)
 	else: 
 		parser.error("incorrect number or type of arguments")
 		
